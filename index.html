@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Space Invaders</title>
+    <meta charset="utf-8" />
+    <script src="wasm_exec.js"></script>
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <a id="source_code" style="float:right;margin-right:10px;" href="https://github.com/2asm/space_invaders">source
+        code</a>
+    <br />
+    <div id="body2">
+        <div style="position: relative;">
+            <canvas id="backCanvas" width="300" height="200"
+                style="position: absolute; left: 0; top: 0; z-index: 0;border:1px solid grey;"></canvas>
+            <canvas id="gameCanvas" width="300" height="200"
+                style="position: absolute; left: 0; top: 0; z-index: 1;border:1px solid grey;"></canvas>
+            <canvas id="missileCanvas" width="300" height="200"
+                style="position: absolute; left: 0; top: 0; z-index: 2;border:1px solid grey;"></canvas>
+        </div>
+    </div>
+    <script>
+        let img = new Image();
+        img.src = "./nutshell.png";
+        img.onload = () => {
+            setTimeout( () => {
+                    let ctx = document.getElementById("backCanvas").getContext("2d")
+                    ctx.drawImage(img, 0, 0);
+                }, 200);
+        }
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("si.wasm"), go.importObject).then((result) => {go.run(result.instance);});
+    </script>
+</body>
+
+</html>
