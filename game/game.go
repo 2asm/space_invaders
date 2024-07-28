@@ -79,6 +79,7 @@ func (g *game) listenForSpaceKey() {
 		}
 		if keyDownState[5] {
 			go func(m *missile) { // player shootMissile
+				m.render()
 				for {
 					g.mutex.Lock()
 					m.clear()
@@ -182,6 +183,7 @@ func (g *game) activateAlienArmy() {
 					m := g.army.aliens[id].launchMissile()
 					g.activeMissiles[m] = struct{}{}
 					g.mutex.Unlock()
+					m.render()
 					for {
 						g.mutex.Lock()
 						m.clear()
