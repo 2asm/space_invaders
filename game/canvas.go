@@ -30,4 +30,6 @@ func init() {
 	c3 := js.Global().Get("document").Call("getElementById", "backCanvas")
 	c3.Set("height", scale*canvasDimX)
 	c3.Set("width", scale*canvasDimY)
+    background_img := js.Global().Get("document").Call("getElementById", "background-image")
+	c3.Call("getContext", "2d").Call("drawImage", background_img, 0, 0, canvasDimY*scale, canvasDimX*scale)
 }

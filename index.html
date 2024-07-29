@@ -22,15 +22,8 @@
                 style="position: absolute; left: 0; top: 0; z-index: 2;border:1px solid grey;"></canvas>
         </div>
     </div>
+    <img id="background-image" src="./nutshell.png" hidden>
     <script>
-        let img = new Image();
-        img.src = "./nutshell.png";
-        img.onload = () => {
-            setTimeout( () => {
-                    let ctx = document.getElementById("backCanvas").getContext("2d")
-                    ctx.drawImage(img, 0, 0);
-                }, 200);
-        }
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch("si.wasm"), go.importObject).then((result) => {go.run(result.instance);});
     </script>

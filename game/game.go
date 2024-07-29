@@ -262,6 +262,7 @@ func (g *game) Start() {
 				g.renderScore()
 			}
 			if g.aliveCount == 0 {
+				time.Sleep(time.Millisecond * 200)
 				g.mutex.Lock()
 				g.resetAlienArmy()
 				g.army.render()

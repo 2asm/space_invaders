@@ -31,8 +31,8 @@ var (
 	}
 
 	missileColor = []string{
-		alienMissile:  "yellow",
-		playerMissile: "red",
+		alienMissile:  "red",
+		playerMissile: "yellow",
 	}
 )
 
