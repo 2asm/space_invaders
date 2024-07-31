@@ -31,6 +31,10 @@ func initialPlayer() *player {
 	return newPlayer(canvasDimX-15, canvasDimY/2)
 }
 
+func (p *player) getBaseCoordinates() []coord {
+	return basePlayer
+}
+
 func (p *player) move(d direction) {
 	p.clear()
 	switch d {

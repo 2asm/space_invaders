@@ -47,8 +47,8 @@ func initialArmy() *alienArmy {
 // aliend missile launch delay int
 // (milliseconds)
 func (aa *alienArmy) getLaunchDelay() time.Duration {
-	r := rand.Intn(aa.aliveCount+aa.aliveCount/10+1) + 1
-	return time.Duration(r) * time.Millisecond * 200
+	r := rand.Intn(aa.aliveCount+1) + aa.aliveCount
+	return time.Duration(r) * time.Millisecond * 100
 }
 
 func (aa *alienArmy) moveLeft(steps int) {

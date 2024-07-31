@@ -24,10 +24,17 @@ func newMissile(baseX, baseY int, kind milssileKind) *missile {
 }
 
 var (
-	baseMissile = []coord{
-		{0, 0},
-		{1, 0},
-		{2, 0},
+	baseMissile = [][]coord{
+		playerMissile: {
+			{0, 0},
+			{1, 0},
+			{2, 0},
+		},
+		alienMissile: {
+			{0, 0},
+			{1, 0},
+			{2, 0},
+		},
 	}
 
 	missileColor = []string{
@@ -35,6 +42,10 @@ var (
 		playerMissile: "yellow",
 	}
 )
+
+func (m *missile) getBaseCoordinates() []coord {
+	return baseMissile[m.kind]
+}
 
 func (m *missile) move() {
 	switch m.kind {
@@ -49,14 +60,14 @@ func (m *missile) move() {
 
 func (m *missile) render() {
 	missileCanvas.Set("fillStyle", missileColor[m.kind])
-	for _, c := range baseMissile {
+	for _, c := range baseMissile[m.kind] {
 		missileCanvas.Call("fillRect", (m.baseY+c.y)*scale, (m.baseX+c.x)*scale, scale, scale)
 	}
 	missileCanvas.Call("fill")
 }
 
 func (m *missile) clear() {
-	for _, c := range baseMissile {
+	for _, c := range baseMissile[m.kind] {
 		missileCanvas.Call("clearRect", (m.baseY+c.y)*scale, (m.baseX+c.x)*scale, scale, scale)
 	}
 	missileCanvas.Call("fill")

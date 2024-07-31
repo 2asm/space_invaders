@@ -188,6 +188,10 @@ var (
 	}
 )
 
+func (a *alien) getBaseCoordinates() []coord {
+	return baseAlien[a.kind][a.state]
+}
+
 func newAlien(id int, kind alienKind, baseX, baseY int) *alien {
 	return &alien{id: id, kind: kind, baseX: baseX, baseY: baseY}
 }

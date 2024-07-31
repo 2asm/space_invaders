@@ -106,8 +106,8 @@ func (g *game) checkMissileCollision(playerMissile *missile) bool {
 		if m.destroyed {
 			continue
 		}
-		for _, c1 := range baseMissile {
-			for _, c2 := range baseMissile {
+		for _, c1 := range m.getBaseCoordinates() {
+			for _, c2 := range playerMissile.getBaseCoordinates() {
 				if c1.add(m.baseX, m.baseY) == c2.add(playerMissile.baseX, playerMissile.baseY) {
 					m.destroyed = true
 					playerMissile.destroyed = true
@@ -123,8 +123,8 @@ func (g *game) checkMissileHit(m *missile) bool {
 	if m.kind == playerMissile {
 		for idx, a := range g.army.aliens {
 			if !a.died {
-				for _, c := range baseAlien[a.kind][a.state] {
-					for _, c2 := range baseMissile {
+				for _, c := range a.getBaseCoordinates() {
+					for _, c2 := range m.getBaseCoordinates() {
 						if newCoord(m.baseX+c2.x, m.baseY+c2.y) == newCoord(c.x+a.baseX, c.y+a.baseY) {
 							a.clear(a.state)
 							g.army.aliens[idx].died = true
@@ -138,8 +138,8 @@ func (g *game) checkMissileHit(m *missile) bool {
 			}
 		}
 	} else {
-		for _, c := range basePlayer {
-			for _, c2 := range baseMissile {
+		for _, c := range g.player.getBaseCoordinates() {
+			for _, c2 := range m.getBaseCoordinates() {
 				if c.add(g.player.baseX, g.player.baseY) == c2.add(m.baseX, m.baseY) {
 					g.isOver = true
 					return true
@@ -152,55 +152,55 @@ func (g *game) checkMissileHit(m *missile) bool {
 
 func (g *game) activateAlienArmy() {
 	for id := range g.army.aliens {
-		go func(id int) { // activate aliens missiles
-			for { // shoot missile
-				if g.isOver {
-					break
-				}
-				t := g.army.getLaunchDelay() - g.launchTimeDiff()
-				if t < 400 {
-					t = time.Millisecond * 400
-				}
-				hop := time.Millisecond * 50
-				for {
-					if g.isOver {
-						break
-					}
-					if t < hop {
-						time.Sleep(t)
-						break
-					} else {
-						t -= hop
-						time.Sleep(hop)
-					}
-				}
-				if g.army.aliens[id].died {
-					time.Sleep(time.Millisecond * 50)
-					continue
-				}
-				go func() { // handle missile
-					g.mutex.Lock()
-					m := g.army.aliens[id].launchMissile()
-					g.activeMissiles[m] = struct{}{}
-					g.mutex.Unlock()
-					m.render()
-					for {
-						g.mutex.Lock()
-						m.clear()
-						m.move()
-						if m.destroyed || m.baseX >= canvasDimX-3 || g.isOver || g.checkMissileHit(m) {
-							m.destroyed = true
-							delete(g.activeMissiles, m)
-							g.mutex.Unlock()
-							break
-						}
-						m.render()
-						g.mutex.Unlock()
-						time.Sleep(time.Millisecond * 30)
-					}
-				}()
+		go g.activateAlienMissile(id)
+	}
+}
+func (g *game) activateAlienMissile(id /*alien id*/ int) {
+	for { // shoot missile
+		if g.isOver {
+			break
+		}
+		t := g.army.getLaunchDelay() - g.launchTimeDiff()
+		hop := time.Millisecond * 50
+		for {
+			if t < hop {
+				time.Sleep(t)
+				break
+			} else {
+				t -= hop
+				time.Sleep(hop)
 			}
-		}(id)
+			if g.isOver {
+				break
+			}
+		}
+		if g.army.aliens[id].died {
+			time.Sleep(time.Millisecond * 50)
+			continue
+		}
+		go g.handleMissile(id)
+	}
+}
+
+func (g *game) handleMissile(id int) {
+	g.mutex.Lock()
+	m := g.army.aliens[id].launchMissile()
+	g.activeMissiles[m] = struct{}{}
+	g.mutex.Unlock()
+	m.render()
+	for {
+		g.mutex.Lock()
+		m.clear()
+		m.move()
+		if m.destroyed || m.baseX >= canvasDimX-3 || g.isOver || g.checkMissileHit(m) {
+			m.destroyed = true
+			delete(g.activeMissiles, m)
+			g.mutex.Unlock()
+			break
+		}
+		m.render()
+		g.mutex.Unlock()
+		time.Sleep(time.Millisecond * 30)
 	}
 }
 
